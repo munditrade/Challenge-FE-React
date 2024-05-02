@@ -24,38 +24,55 @@ const transportOptions = {
   },
 };
 /** 1 */
-const transportOptionsFormatted = {};
+const transportOptionsFormatted = {
+  data: Object.keys(transportOptions.data).reduce((acc, key) => {
+    acc[key] = {
+      ...transportOptions.data[key],
+      type: transportOptions.transportType[key],
+    };
+    return acc;
+  }, {}),
+  keys: Object.keys(transportOptions.data),
+  transportType: [
+    ...new Set(
+      Object.values(transportOptions.transportType).map((i) => i.toUpperCase())
+    ),
+  ],
+};
+
+console.log(transportOptionsFormatted);
 
 function App() {
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(0);
 
   const handleChange = (event) => {
-    /** 3 */
+    setSelectedOption(event?.target.value);
   };
 
   return (
     <div className="App">
       <p>
         Tipos de medio de transporte:
-        {/* 2- <span></span> */}
+        {transportOptionsFormatted.transportType.map((i) => (
+          <span>{i}</span>
+        ))}
       </p>
       <div className="select-container">
         <label>Selecciona un medio de transporte</label>
         <select value={selectedOption} onChange={handleChange}>
-          <option value="opcion1">Opción 1</option>
-          <option value="opcion2">Opción 2</option>
-          {/* 3- ....*/}
+          {transportOptionsFormatted.keys.map((i) => (
+            <option>{i}</option>
+          ))}
         </select>
-
-        <button
-        // 5- onClick={() => {}}
-        >
-          Limpiar
-        </button>
+        <button onClick={() => setSelectedOption(null)}>Limpiar</button>
       </div>
-      {/* 4- {selectedOption && <ul>
-        <li>Opcion1: Valor1</li>
-      </ul>} */}
+      {selectedOption && (
+        <ul>
+          <li>{transportOptionsFormatted.data[selectedOption].amount}</li>
+          <li>{transportOptionsFormatted.data[selectedOption].description}</li>
+          <li>{transportOptionsFormatted.data[selectedOption].type}</li>
+        </ul>
+      )}
     </div>
   );
 }
