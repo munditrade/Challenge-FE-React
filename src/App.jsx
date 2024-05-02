@@ -24,7 +24,32 @@ const transportOptions = {
   },
 };
 /** 1 */
-const transportOptionsFormatted = {};
+
+const getKeys = (data) => {
+  return Object.values(data)
+}
+
+const getTransportTypes = (data) => {
+  const entries = Object.entries(data)
+  return entries.reduce((acc, [key, value]) => {
+    if (!acc.includes(value)) acc.push(value)
+    return acc
+  }, [])
+}
+
+const getFormattedTransports = (data, transportType) => {
+  const entries = Object.entries(data)
+
+  return entries.reduce((acc, [key, values]) => {
+    return {...acc, [key]: {...values, type: transportType[key]}}
+  }, {})
+}
+
+const transportOptionsFormatted = {
+  data: getFormattedTransports(transportOptions.data, transportOptions.transportType),
+  keys: getKeys(transportOptions.transportType),
+  transportType: `Listado de  "${getTransportTypes(transportOptions.transportType)}"`
+};
 
 function App() {
   const [selectedOption, setSelectedOption] = useState(null);
@@ -37,7 +62,7 @@ function App() {
     <div className="App">
       <p>
         Tipos de medio de transporte:
-        {/* 2- <span></span> */}
+        <span>{getTransportTypes(transportOptions.transportType)}</span>
       </p>
       <div className="select-container">
         <label>Selecciona un medio de transporte</label>
