@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 
 const transportOptions = {
@@ -24,38 +24,68 @@ const transportOptions = {
   },
 };
 /** 1 */
-const transportOptionsFormatted = {};
+const transportOptionsFormatted = {
+  data: Object.entries(transportOptions.data).reduce((acum, [key, value]) => {
+    return {
+      ...acum,
+      [key]: {
+        ...value,
+        type: transportOptions.transportType[key],
+      },
+    };
+  }, {}),
+  keys: Object.keys(transportOptions.data).reduce((acum, curr) => {
+    if (acum.includes(curr)) return acum;
+    return [...acum, curr];
+  }, []),
+  transportType: Object.values(transportOptions.transportType)
+    .reduce((acum, curr) => {
+      if (acum.includes(curr)) return acum;
+      return [...acum, curr];
+    }, [])
+    .join(", ")
+    .toLocaleUpperCase(),
+};
 
 function App() {
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(undefined);
 
   const handleChange = (event) => {
-    /** 3 */
+    setSelectedOption({
+      type: event.target.value,
+      value: transportOptionsFormatted.data[event.target.value],
+    });
   };
 
   return (
-    <div className="App">
+    <div className='App'>
       <p>
-        Tipos de medio de transporte:
-        {/* 2- <span></span> */}
+        Tipos de medio de transporte:{" "}
+        {transportOptionsFormatted.transportType.replace(/,/g, "-")}
       </p>
-      <div className="select-container">
+      <div className='select-container'>
         <label>Selecciona un medio de transporte</label>
-        <select value={selectedOption} onChange={handleChange}>
-          <option value="opcion1">Opción 1</option>
-          <option value="opcion2">Opción 2</option>
-          {/* 3- ....*/}
+        <select
+          value={selectedOption?.type}
+          onChange={handleChange}>
+          {transportOptionsFormatted.keys.map((transport) => (
+            <option key={transport} value={transport}>
+              {transport}
+            </option>
+          ))}
         </select>
 
-        <button
-        // 5- onClick={() => {}}
-        >
-          Limpiar
-        </button>
+        <button onClick={() => setSelectedOption(undefined)}>Limpiar</button>
       </div>
-      {/* 4- {selectedOption && <ul>
-        <li>Opcion1: Valor1</li>
-      </ul>} */}
+      {selectedOption?.value && (
+        <ul>
+          {Object.entries(selectedOption.value).map(([key, value]) => (
+            <li key={key}>
+              {key}: {value}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
